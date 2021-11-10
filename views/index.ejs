@@ -56,8 +56,8 @@
 
           <td class="text-center ">
             <button class="btn btn-sm btn-light" onclick=copyPartNumberToClipboard()>Skopiuj <strong>numer częsci</strong></button>
-            <button class="btn btn-sm btn-info" onclick=copyPlnToClipboard()>Skopiuj cene <strong>PLN(NETTO)</strong></button>
-            <button class="btn btn-sm btn-info" onclick=copyPlnToClipboard()>Skopiuj cene <strong>PLN(BRUTTO)</strong></button>
+            <button class="btn btn-sm btn-info" onclick=copyPlnNettoToClipboard()>Skopiuj cene <strong>PLN(NETTO)</strong></button>
+            <button class="btn btn-sm btn-info" onclick=copyPlnBruttoToClipboard()>Skopiuj cene <strong>PLN(BRUTTO)</strong></button>
           </td>
           
         </tr>
@@ -67,8 +67,17 @@
   </table>
 </div>
 <script>
-  function copyPlnToClipboard() {
-    let plnPrice = document.querySelector("#pln-price").textContent;
+  function copyPlnNettoToClipboard() {
+    let plnPrice = document.querySelector("#pln-price-netto").textContent;
+
+    navigator.clipboard.writeText(plnPrice).then(function() {
+      console.log('Async: Copying to clipboard was successful!');
+    }, function(err) {
+      console.error('Async: Could not copy text: ', err);
+    });
+  } 
+  function copyPlnBruttoToClipboard() {
+    let plnPrice = document.querySelector("#pln-price-brutto").textContent;
 
     navigator.clipboard.writeText(plnPrice).then(function() {
       console.log('Async: Copying to clipboard was successful!');
