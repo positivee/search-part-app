@@ -45,8 +45,13 @@
           <td id="partNumber"><%= part.Part_Number %></td>
           <!-- <td class="eur-price"><%= part.LIST_PRICE  %> EUR</td> -->
           <td class="eur-price"><%= (part.LIST_PRICE + (part.LIST_PRICE * 0.050)).toFixed(2) %> EUR</td>
+          <% if (euroPrice == 'brak internetu') { %>
+            <td><span id="pln-price">Brak internetu</td>
+              <% } else  { %>
+                <td><span id="pln-price"><%= ((part.LIST_PRICE + (part.LIST_PRICE * 0.050)) * euroPrice).toFixed(2) %></span> PLN</td>
+          <% } %>
+          
 
-          <td><span id="pln-price"><%= ((part.LIST_PRICE + (part.LIST_PRICE * 0.050)) * euroPrice).toFixed(2) %></span> PLN</td>
           <td class="text-center ">
             <button class="btn btn-sm btn-light" onclick=copyPartNumberToClipboard()>Skopiuj numer częsci do schowka</button>
             <button class="btn btn-sm btn-info" onclick=copyPlnToClipboard()>Skopiuj cene PLN do schowka</button>
