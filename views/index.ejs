@@ -34,7 +34,8 @@
       <tr class="text-center ">
         <th scope="col">NUMER CZĘŚCI</th>
         <th scope="col">CENA W EURO</th>
-        <th scope="col">CENA W PLN</th>
+        <th scope="col">CENA W PLN (NETTO)</th>
+        <th scope="col">CENA W PLN (BRUTTO)</th>
         <th scope="col">AKCJA</th>
       </tr>
     </thead>
@@ -48,13 +49,15 @@
           <% if (euroPrice == 'brak internetu') { %>
             <td><span id="pln-price">Brak internetu</td>
               <% } else  { %>
-                <td><span id="pln-price"><%= ((part.LIST_PRICE + (part.LIST_PRICE * 0.050)) * euroPrice).toFixed(2) %></span> PLN</td>
+                <td><span id="pln-price-netto"><%= ((part.LIST_PRICE + (part.LIST_PRICE * 0.050)) * euroPrice).toFixed(2) %></span> PLN</td>
+                <td><span id="pln-price-brutto"><%= (((part.LIST_PRICE + (part.LIST_PRICE * 0.050)) * euroPrice) * 1.23).toFixed(2) %></span> PLN</td>
           <% } %>
           
 
           <td class="text-center ">
-            <button class="btn btn-sm btn-light" onclick=copyPartNumberToClipboard()>Skopiuj numer częsci do schowka</button>
-            <button class="btn btn-sm btn-info" onclick=copyPlnToClipboard()>Skopiuj cene PLN do schowka</button>
+            <button class="btn btn-sm btn-light" onclick=copyPartNumberToClipboard()>Skopiuj <strong>numer częsci</strong></button>
+            <button class="btn btn-sm btn-info" onclick=copyPlnToClipboard()>Skopiuj cene <strong>PLN(NETTO)</strong></button>
+            <button class="btn btn-sm btn-info" onclick=copyPlnToClipboard()>Skopiuj cene <strong>PLN(BRUTTO)</strong></button>
           </td>
           
         </tr>
