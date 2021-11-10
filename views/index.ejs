@@ -1,0 +1,82 @@
+<%- include('header') %> 
+
+<div class="bg-dark text-center p-3">
+  <div class="text-light text-bold">
+    Akutalna cena EURO według NBP: <strong><%= euroPrice %> zł</strong>
+  </div>
+</div>
+<div class="container">
+
+  
+  <div class="row justify-content-center mt-5 mb-5">
+    <div class="col-12 col-md-10 col-lg-8">
+      <form action="/searchpart" method="POST">
+            <div class="card-body row no-gutters align-items-center">
+                
+                <!--end of col-->
+                <div class="col">
+                    <input name="Partnumber" class="form-control form-control-lg form-control-borderless" type="text" placeholder="Szukaj po numerze części">
+                </div>
+                <!--end of col-->
+                <div class="col-auto">
+                    <button class="btn btn-lg btn-success" type="submit">Szukaj</button>
+                </div>
+                <!--end of col-->
+            </div>
+        </form>
+    </div>
+    <!--end of col-->
+</div>
+
+
+  <table class="table">
+    <thead>
+      <tr class="text-center ">
+        <th scope="col">NUMER CZĘŚCI</th>
+        <th scope="col">CENA W EURO</th>
+        <th scope="col">CENA W PLN</th>
+        <th scope="col">AKCJA</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (locals.searchPart) { %>
+      <% for (const part of searchPart) { %>
+        <tr class="text-center h4">
+          <td id="partNumber"><%= part.Part_Number %></td>
+          <!-- <td class="eur-price"><%= part.LIST_PRICE  %> EUR</td> -->
+          <td class="eur-price"><%= (part.LIST_PRICE + (part.LIST_PRICE * 0.050)).toFixed(2) %> EUR</td>
+
+          <td><span id="pln-price"><%= ((part.LIST_PRICE + (part.LIST_PRICE * 0.050)) * euroPrice).toFixed(2) %></span> PLN</td>
+          <td class="text-center ">
+            <button class="btn btn-sm btn-light" onclick=copyPartNumberToClipboard()>Skopiuj numer częsci do schowka</button>
+            <button class="btn btn-sm btn-info" onclick=copyPlnToClipboard()>Skopiuj cene PLN do schowka</button>
+          </td>
+          
+        </tr>
+        <% } %>
+        <% } %>
+    </tbody>
+  </table>
+</div>
+<script>
+  function copyPlnToClipboard() {
+    let plnPrice = document.querySelector("#pln-price").textContent;
+
+    navigator.clipboard.writeText(plnPrice).then(function() {
+      console.log('Async: Copying to clipboard was successful!');
+    }, function(err) {
+      console.error('Async: Could not copy text: ', err);
+    });
+  } 
+  function copyPartNumberToClipboard() {
+    let partNumber = document.querySelector("#partNumber").textContent.trim();
+
+    navigator.clipboard.writeText(partNumber).then(function() {
+      console.log('Async: Copying to clipboard was successful!');
+    }, function(err) {
+      console.error('Async: Could not copy text: ', err);
+    });
+  } 
+</script>
+
+<%- include('footer') %> 
