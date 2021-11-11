@@ -5,10 +5,6 @@ const partRoutes = require("./partRoutes");
 
 // Create express application
 const app = express();
-
-// app.use(bodyParser.urlencoded({extended: false}));
-// app.use(bodyParser.json());
-
 app.use(express.urlencoded());
 app.use(express.json());
 

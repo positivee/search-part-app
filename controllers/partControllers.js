@@ -25,10 +25,6 @@ function search_part_post(request, response) {
     .end(function (result) {
       let euroPrice = "brak internetu";
       if (result.body != undefined) euroPrice = result.body.rates[0].mid;
-
-      // response.render('index', {euroPrice: euroPrice});
-      // console.log( euroPrice);
-
       partModel.getPartInformation(part_number, (result) => {
         console.log(result);
         response.render("index", { searchPart: result, euroPrice: euroPrice });
