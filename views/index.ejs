@@ -1,13 +1,25 @@
 <%- include('header') %> 
 
 <div class="bg-dark text-center p-3">
-  <div class="text-light text-bold">
-    Akutalna cena EURO według NBP: <strong><%= euroPrice %> zł</strong>
+  <div class="container">
+    <div class="row">
+    <div class="text-light text-bold col-6">
+      Akutalna cena EURO według NBP: <strong><%= euroPrice %> zł</strong>
+    
+    </div>
+    <div class="text-light text-bold col-6 float-right">
+      <form action="/upload" method="POST" enctype="multipart/form-data" id="file-upload-form"> 
+              <label for="file-upload" class="custom-file-upload">
+               <img src="export.png" class="button-export">
+              </label>
+              <input id="file-upload" class="form-control form-control-lg form-control-borderless" type="file" accept=".xls,.xlsx" name="Excelfile" >
+        </div>
+     </form>
+    </div>
+    </div>
   </div>
 </div>
-<div class="container">
-
-  
+<div class="container"> 
   <div class="row justify-content-center mt-5 mb-5">
     <div class="col-12 col-md-10 col-lg-8">
       <form action="/searchpart" method="POST">
@@ -15,7 +27,7 @@
                 
                 <!--end of col-->
                 <div class="col">
-                    <input name="Partnumber" class="form-control form-control-lg form-control-borderless" type="text" placeholder="Szukaj po numerze części">
+                    <input name="Partnumber" class="form-control form-control-lg form-control-borderless" type="text" placeholder="Szukaj po numerze części" required="required">
                 </div>
                 <!--end of col-->
                 <div class="col-auto">
@@ -35,39 +47,53 @@
         <th scope="col">CENA W EURO</th>
         <th scope="col">CENA W PLN (NETTO)</th>
         <th scope="col">CENA W PLN (BRUTTO)</th>
+        <th scope="col">ILOŚĆ SZTUK</th> 
         <th scope="col">AKCJA</th>
       </tr>
     </thead>
     <tbody>
+      <%
+      getPriceChgArrow = function() {
+        console.log("partNumber");
+      }
+      %>
+
+
       <% if (locals.searchPart) { %>
-      <% for (const part of searchPart) { %>
+      <% for (const part of searchPart) {  %>
         <tr class="text-center h4">
-          <td id="partNumber"><%= part.Part_Number %></td>
+          <td id="partNumber"><%= part.partNumber %></td>
           <!-- <td class="eur-price"><%= part.LIST_PRICE  %> EUR</td> -->
           <td class="eur-price"><%= (part.LIST_PRICE + (part.LIST_PRICE * 0.050)).toFixed(2) %> EUR</td>
           <% if (euroPrice == 'brak internetu') { %>
             <td><span id="pln-price">Brak internetu</td>
               <% } else  { %>
-                <td><span id="pln-price-netto"><%= ((part.LIST_PRICE + (part.LIST_PRICE * 0.050)) * euroPrice).toFixed(2) %></span> PLN</td>
+                <td><span id="<%= part.partNumber %>"><%= ((part.LIST_PRICE + (part.LIST_PRICE * 0.050)) * euroPrice).toFixed(2) %></span> PLN</td>
                 <td><span id="pln-price-brutto"><%= (((part.LIST_PRICE + (part.LIST_PRICE * 0.050)) * euroPrice) * 1.23).toFixed(2) %></span> PLN</td>
           <% } %>
-          
+          <td ><%= part.partsCount %></td>
+
 
           <td class="text-center ">
-            <button class="btn btn-sm btn-light" onclick=copyPartNumberToClipboard()>Skopiuj <strong>numer częsci</strong></button>
-            <button class="btn btn-sm btn-info" onclick=copyPlnNettoToClipboard()>Skopiuj cene <strong>PLN(NETTO)</strong></button>
-            <button class="btn btn-sm btn-info" onclick=copyPlnBruttoToClipboard()>Skopiuj cene <strong>PLN(BRUTTO)</strong></button>
+            <button class="btn btn-sm btn-light" onclick="copyPartNumberToClipboard('<%= part.partNumber %>')">Skopiuj <strong>numer częsci</strong></button>
+            <button class="btn btn-sm btn-info" onclick="copyPlnNettoToClipboard('<%= part.partNumber %>')">Skopiuj cene <strong>PLN(NETTO)</strong></button>
+
           </td>
           
         </tr>
         <% } %>
         <% } %>
+
+        
     </tbody>
   </table>
 </div>
 <script>
-  function copyPlnNettoToClipboard() {
-    let plnPrice = document.querySelector("#pln-price-netto").textContent;
+   document.querySelector("#file-upload").onchange = function() {
+     document.querySelector("#file-upload-form").submit();
+   };
+  function copyPlnNettoToClipboard(partNumber) {
+     let plnPrice = document.querySelector("#"+partNumber).textContent;
 
     navigator.clipboard.writeText(plnPrice).then(function() {
       console.log('Async: Copying to clipboard was successful!');
@@ -75,17 +101,7 @@
       console.error('Async: Could not copy text: ', err);
     });
   } 
-  function copyPlnBruttoToClipboard() {
-    let plnPrice = document.querySelector("#pln-price-brutto").textContent;
-
-    navigator.clipboard.writeText(plnPrice).then(function() {
-      console.log('Async: Copying to clipboard was successful!');
-    }, function(err) {
-      console.error('Async: Could not copy text: ', err);
-    });
-  } 
-  function copyPartNumberToClipboard() {
-    let partNumber = document.querySelector("#partNumber").textContent.trim();
+  function copyPartNumberToClipboard(partNumber) {
 
     navigator.clipboard.writeText(partNumber).then(function() {
       console.log('Async: Copying to clipboard was successful!');
@@ -93,6 +109,8 @@
       console.error('Async: Could not copy text: ', err);
     });
   } 
+    
+ 
 </script>
 
 <%- include('footer') %> 

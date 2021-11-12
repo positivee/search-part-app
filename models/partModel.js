@@ -1,41 +1,51 @@
 // Load modules
-const database = require('../database/database');
-// const path = require('path');
-// const ADODB = require('node-adodb');
-
-// const mdb_path = path.join(__dirname, '../database', 'cennik.mdb');
-// const connection = ADODB.open('Provider=Microsoft.Jet.OLEDB.4.0;Data Source='+mdb_path+';');
-
-
+const database = require("../database/database");
 
 //GET PART NUMBER
 const getPartInformation = (part_number, callback) => {
+  const sql =
+    `SELECT TRIM(Part_Number) AS partNumber, LIST_PRICE FROM Cennik WHERE TRIM(Part_Number)='` +
+    part_number +
+    `'`;
 
- const sql = `SELECT Part_Number, LIST_PRICE FROM Cennik WHERE TRIM(Part_Number)='`+part_number+`'`;
-
-  database.connection.query(sql)
-    .then(data => {
-      console.log(data);
+  database.connection
+    .query(sql)
+    .then((data) => {
       callback(data);
     })
-    .catch(error => {
+    .catch((error) => {});
+};
+const getPartsInformations = (partsFromExcel, callback) => {
+  partsToSql = "";
+  for (let i = 0; i < partsFromExcel.length - 1; i++) {
+    partsToSql += `'` + partsFromExcel[i].partNumber + `',`;
+  }
+  partsToSql +=
+    `'` + partsFromExcel[partsFromExcel.length - 1].partNumber + `'`;
+
+  const sql =
+    `SELECT TRIM(Part_Number) AS partNumber, LIST_PRICE FROM Cennik WHERE TRIM(Part_Number) IN (` +
+    partsToSql +
+    `) ORDER BY 1`;
+
+  database.connection
+    .query(sql)
+    .then((data) => {
+      //MERGIN TWO OBJECTS FROM EXCEL AND FROM ACCESS
+      const result = partsFromExcel.map((v) => ({
+        ...v,
+        ...data.find((sp) => sp.partNumber === v.partNumber),
+      }));
+
+      callback(result);
+    })
+    .catch((error) => {
       console.error(error);
     });
-
-  // console.log(sql);
-  // database.appDatabase.all(sql, [], (error, rows) => {
-  //   if (error) {
-  //     console.error(error.message);
-  //   }
-  //   callback(rows);
-
-  // });
 };
-
-
-
 
 // Export models
 module.exports = {
-  getPartInformation
+  getPartInformation,
+  getPartsInformations,
 };
