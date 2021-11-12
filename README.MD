@@ -1,1 +1,1 @@
-Simple App Using Microsoft Access Database with Node.js to search easily through .mdb database.
+Simple App Using Microsoft Access Database with Node.js to search easily through .mdb database. You can upload specialy modified excel. It will look through excel and list current prices for those parts from database.
