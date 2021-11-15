@@ -3,8 +3,22 @@ const partModel = require("../models/partModel");
 const multer = require("multer");
 const unirest = require("unirest");
 const xlsx = require("xlsx");
+const axios = require("axios");
+const fetchEuroPrice = async () => {
+  return axios
+    .get("https://api.nbp.pl/api/exchangerates/rates/a/eur/")
+    .then(function (response) {
+      // handle success
+      // console.log(response.data.rates[0].mid);
+      return response.data.rates[0].mid;
+    })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+    });
+};
 
-let storage = multer.diskStorage({
+const storage = multer.diskStorage({
   destination: function (req, file, callback) {
     callback(null, "./excel");
   },
@@ -13,35 +27,36 @@ let storage = multer.diskStorage({
   },
 });
 
-let upload = multer({ storage: storage }).single("Excelfile");
+const upload = multer({ storage: storage }).single("Excelfile");
 
-function search_part_get(request, response) {
-  unirest
-    .get("https://api.nbp.pl/api/exchangerates/rates/a/eur/")
-    .end(function (result) {
-      let euroPrice = "brak internetu";
-      if (result.body != undefined) euroPrice = result.body.rates[0].mid;
-
-      response.render("index", { euroPrice: euroPrice });
-    });
+async function search_part_get(request, response) {
+  if ((await fetchEuroPrice()) != undefined)
+    response.render("index", { euroPrice: await fetchEuroPrice() });
+  else response.render("index", { euroPrice: "brak interentu" });
 }
 
 // POST
-function search_part_post(request, response) {
+async function search_part_post(request, response) {
   const part_number = request.body.Partnumber;
+  const euroPrice = await fetchEuroPrice();
 
-  unirest
-    .get("https://api.nbp.pl/api/exchangerates/rates/a/eur/")
-    .end(function (result) {
-      let euroPrice = "brak internetu";
-      if (result.body != undefined) euroPrice = result.body.rates[0].mid;
-      partModel.getPartInformation(part_number, (result) => {
-        response.render("index", { searchPart: result, euroPrice: euroPrice });
+  if ((await fetchEuroPrice()) != undefined) {
+    partModel.getPartInformation(part_number, (result) => {
+      response.render("index", {
+        searchPart: result,
+        euroPrice: euroPrice,
       });
+    });
+  } else
+    response.render("index", {
+      searchPart: result,
+      euroPrice: "brak interentu",
     });
 }
 
-function search_parts_excel(request, response) {
+async function search_parts_excel(request, response) {
+  const euroPrice = await fetchEuroPrice();
+
   upload(request, response, function (err) {
     if (err) {
       console.log(err);
@@ -50,18 +65,17 @@ function search_parts_excel(request, response) {
       const partsFromExcel = convertExcelToObject(
         "excel/" + request.file.originalname
       );
-      unirest
-        .get("https://api.nbp.pl/api/exchangerates/rates/a/eur/")
-        .end(function (result) {
-          let euroPrice = "brak internetu";
-          if (result.body != undefined) euroPrice = result.body.rates[0].mid;
-
-          partModel.getPartsInformations(partsFromExcel, (result) => {
-            response.render("index", {
-              searchPart: result,
-              euroPrice: euroPrice,
-            });
+      if (euroPrice != undefined) {
+        partModel.getPartsInformations(partsFromExcel, (result) => {
+          response.render("index", {
+            searchPart: result,
+            euroPrice: euroPrice,
           });
+        });
+      } else
+        response.render("index", {
+          searchPart: result,
+          euroPrice: "brak interentu",
         });
     }
   });
