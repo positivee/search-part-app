@@ -67,6 +67,15 @@ async function search_parts_excel(request, response) {
       );
       if (euroPrice != undefined) {
         partModel.getPartsInformations(partsFromExcel, (result) => {
+          //counting full list price
+          const reultCount = result.reduce((acc, curr) => {
+            if (curr.LIST_PRICE != undefined) {
+              acc += curr.LIST_PRICE;
+            }
+            return acc;
+          }, 0);
+          console.log(reultCount);
+
           response.render("index", {
             searchPart: result,
             euroPrice: euroPrice,

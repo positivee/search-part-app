@@ -51,12 +51,7 @@
         <th scope="col">AKCJA</th>
       </tr>
     </thead>
-    <tbody>
-      <%
-      getPriceChgArrow = function() {
-        console.log("partNumber");
-      }
-      %>
+    <tbody class="tbody">
 
 
       <% if (locals.searchPart) { %>
@@ -68,15 +63,15 @@
           <% if (euroPrice == 'brak internetu') { %>
             <td><span id="pln-price">Brak internetu</td>
               <% } else  { %>
-                <td><span id="<%= part.partNumber %>"><%= ((part.LIST_PRICE + (part.LIST_PRICE * 0.050)) * euroPrice).toFixed(2) %></span> PLN</td>
+                <td><span class ="pln-price" id="<%= part.partNumber %>"><%= ((part.LIST_PRICE + (part.LIST_PRICE * 0.050)) * euroPrice).toFixed(2) %></span> PLN</td>
                 <td><span id="pln-price-brutto"><%= (((part.LIST_PRICE + (part.LIST_PRICE * 0.050)) * euroPrice) * 1.23).toFixed(2) %></span> PLN</td>
           <% } %>
           <td ><%= part.partsCount %></td>
 
 
           <td class="text-center ">
-            <button class="btn btn-sm btn-light" onclick="copyPartNumberToClipboard('<%= part.partNumber %>')">Skopiuj <strong>numer częsci</strong></button>
-            <button class="btn btn-sm btn-info" onclick="copyPlnNettoToClipboard('<%= part.partNumber %>')">Skopiuj cene <strong>PLN(NETTO)</strong></button>
+            <button class="btn btn-sm btn-light copyPartNumber">Skopiuj <strong>numer częsci</strong></button>
+            <button class="btn btn-sm btn-info copyNetto">Skopiuj cene <strong>PLN(NETTO)</strong></button>
 
           </td>
           
@@ -92,23 +87,32 @@
    document.querySelector("#file-upload").onchange = function() {
      document.querySelector("#file-upload-form").submit();
    };
-  function copyPlnNettoToClipboard(partNumber) {
-     let plnPrice = document.querySelector("#"+partNumber).textContent;
+   
 
-    navigator.clipboard.writeText(plnPrice).then(function() {
-      console.log('Async: Copying to clipboard was successful!');
-    }, function(err) {
-      console.error('Async: Could not copy text: ', err);
-    });
-  } 
-  function copyPartNumberToClipboard(partNumber) {
+   document.querySelector('.table').addEventListener('click', e => {
+    if(e.target.classList.contains('copyNetto')){
+      let singleRow = e.target.parentElement.parentElement;
+      const plnPrice = singleRow.querySelector(".pln-price").textContent;
+        navigator.clipboard.writeText(plnPrice).then(function() {
+          console.log('Async: Copying to clipboard was successful!');
+          singleRow.classList.add("bg-secondary");
+        }, function(err) {
+          console.error('Async: Could not copy text: ', err);
+        });
+      }
 
-    navigator.clipboard.writeText(partNumber).then(function() {
-      console.log('Async: Copying to clipboard was successful!');
-    }, function(err) {
-      console.error('Async: Could not copy text: ', err);
-    });
-  } 
+      if(e.target.classList.contains('copyPartNumber')){
+    
+      const partNumber = e.target.parentElement.parentElement.querySelector("#partNumber").textContent;
+        navigator.clipboard.writeText(partNumber).then(function() {
+          console.log('Async: Copying to clipboard was successful!');
+        }, function(err) {
+          console.error('Async: Could not copy text: ', err);
+        });
+      }
+
+
+   });
     
  
 </script>
