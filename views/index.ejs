@@ -38,7 +38,15 @@
         </form>
     </div>
     <!--end of col-->
+    
+    <div class="row justify-content-center mt-3">
+
+      <button class="btn btn-sm btn-warning calculateButton col-6">Oblicz całkowitą wartość netto</button>
+      <span class="text-center h5 calculateValue col-6"></span>
+    </div>
+  
 </div>
+
 
   <table class="table">
     <thead>
@@ -63,7 +71,7 @@
           <% if (euroPrice == 'brak internetu') { %>
             <td><span id="pln-price">Brak internetu</td>
               <% } else  { %>
-                <td><span class ="pln-price" id="<%= part.partNumber %>"><%= ((part.LIST_PRICE + (part.LIST_PRICE * 0.050)) * euroPrice).toFixed(2) %></span> PLN</td>
+                <td><span class ="pln-price"><%= ((part.LIST_PRICE + (part.LIST_PRICE * 0.050)) * euroPrice).toFixed(2) %></span> PLN</td>
                 <td><span id="pln-price-brutto"><%= (((part.LIST_PRICE + (part.LIST_PRICE * 0.050)) * euroPrice) * 1.23).toFixed(2) %></span> PLN</td>
           <% } %>
           <td ><%= part.partsCount %></td>
@@ -87,7 +95,7 @@
    document.querySelector("#file-upload").onchange = function() {
      document.querySelector("#file-upload-form").submit();
    };
-   
+
 
    document.querySelector('.table').addEventListener('click', e => {
     if(e.target.classList.contains('copyNetto')){
@@ -110,11 +118,25 @@
           console.error('Async: Could not copy text: ', err);
         });
       }
+      
 
-
+  
    });
     
- 
+   const buttonAllNett = document.querySelector('.calculateButton');
+   buttonAllNett.addEventListener('click', e =>{
+      document.querySelector('.calculateValue').innerHTML = countAllPriceNetto() + " PLN";
+   });
+
+  const countAllPriceNetto = ()=>{
+      const resultCount = Array.from(document.querySelector('.tbody').children)
+        .reduce((acc, row )=>{
+        acc+= isNaN(parseFloat(row.children[2].children[0].textContent)) ? 0 : parseFloat(row.children[2].children[0].textContent) ;
+        return acc; 
+      }, 0)
+      return resultCount.toFixed(2);
+    }
+
 </script>
 
-<%- include('footer') %> 
+<%- include('footer') %>  
